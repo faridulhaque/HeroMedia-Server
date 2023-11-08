@@ -1,7 +1,9 @@
 const { MongoClient } = require("mongodb");
+require("dotenv").config();
 
 
-const client = new MongoClient("mongodb+srv://faridulhaquemurshed:bi64wE6Fu2Y1Eukw@cluster0.glmhfdv.mongodb.net/?retryWrites=true&w=majority", {
+
+const client = new MongoClient(process.env.MONGODB_TOKEN, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
@@ -27,5 +29,5 @@ module.exports = {
     getDb: function () {
         return dbConnection;
     },
-    
+
 };
