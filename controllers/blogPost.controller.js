@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const { getDb } = require("../utils/dbConnect");
 
 const blogPost = async (req, res, next) => {
@@ -14,6 +15,48 @@ const blogPost = async (req, res, next) => {
         res.status(400).send(error);
     }
 }
+
+
+const getOneBlogPost = async (req, res, next) => {
+    try {
+        const db = getDb();
+        const collection = db.collection("blogPosts")
+        const id = req.params.id;
+
+        const query = { _id: ObjectId(id) };
+
+        const result = await collection.findOne(query);
+
+        res.status(200).json(result);
+
+
+    } catch (error) {
+        res.status(400).send(error);
+    }
+}
+
+const makeLikeUnlike = async (req, res, next) => {
+    const db = getDb();
+    const collection = db.collection("blogPosts");
+    const id = req.params.id;
+  
+    const email = req.body.email;
+  
+    const query = { _id: ObjectId(id) };
+  
+    const existingDocument = await collection.findOne(query);
+    const isEmailPresent = existingDocument?.likes?.includes(email);
+  
+    let update;
+    if (isEmailPresent) {
+      update = { $pull: { likes: email } };
+    } else {
+      update = { $push: { likes: email } };
+    }
+  
+    const result = await collection.updateOne(query, update);
+    res.status(200).json(result);
+  };
 
 const getAllBlogs = async (req, res) => {
     try {
@@ -32,4 +75,4 @@ const getAllBlogs = async (req, res) => {
 }
 
 
-module.exports = { blogPost, getAllBlogs };
+module.exports = { blogPost, getAllBlogs, getOneBlogPost, makeLikeUnlike };
